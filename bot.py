@@ -133,7 +133,7 @@ async def stock(ctx, number_generated: int):
     global current_bidder
     current_bidder = {}
     current_bid = {}
-    price_mod = 0.8
+    price_mod = 0.7
     reg_discount = 0.6
     items = [
         random.choice(range(1, 101))
