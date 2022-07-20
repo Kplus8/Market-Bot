@@ -1,4 +1,4 @@
-# bot.py
+# main.py
 import os
 import random
 import sys
