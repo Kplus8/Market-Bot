@@ -18,7 +18,7 @@ def gen_item(inven, amount):
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='$')
 
 file = "Inven_chance.csv"
 file2 = "inven_price.csv"
