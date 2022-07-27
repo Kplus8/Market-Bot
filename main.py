@@ -89,14 +89,18 @@ async def level(ctx, hp_growth: int, str_growth: int, mag_growth: int, skl_growt
                 gained[x] = True
                 total_gains += 1
         if ctx.author.name == "Kplus8":
-            #print("cheating")
-            if (int(gained[1]) + int(gained[3]) + int(gained[4]) < 2):
-                gained[3] = True
-                gained[4] = True
+            if int(gained[1]) + int(gained[3]) + int(gained[4]) < 2:
+                total_gains = 0
+
+    out1 = "HP: " + str(rolls[0]) + ', ' + "Str: " + str(rolls[1]) + ', ' + "Mag: " + str(
+        rolls[2]) + ', ' + "Skl: " + str(rolls[3]) + ', ' + "Spd: " + str(rolls[4]) + ', ' + "Lck: " + str(
+        rolls[5]) + ', ' + "Def: " + str(rolls[6]) + ', ' + "Res: " + str(rolls[7])
+
     out = "HP: " + str(gained[0]) + '\n' + "Str: " + str(gained[1]) + '\n' + "Mag: " + str(
         gained[2]) + '\n' + "Skl: " + str(gained[3]) + '\n' + "Spd: " + str(gained[4]) + '\n' + "Lck: " + str(
         gained[5]) + '\n' + "Def: " + str(gained[6]) + '\n' + "Res: " + str(gained[7])
 
+    await ctx.send(out1)
     await ctx.send(out)
 
 @bot.command(name='bid_check', help='To see what the current bids are')
