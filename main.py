@@ -145,7 +145,7 @@ async def restock(ctx, items):
     for count in range(0, len(new_stock)):
         new_bid = new_stock[count]
         current_bidder[new_bid[1]] = new_bid[0]
-        current_bid[new_bid[1]] = new_bid[2]
+        current_bid[new_bid[1]] = int(new_bid[2])
     await ctx.send("Testing")
 
 
