@@ -130,6 +130,26 @@ async def bid(ctx, bid_amount: int, item_bid):
         await ctx.send(item_bid + " is not currently in auction. Make sure you are spelling it correctly & try again. (Tips:\n1. case matters, make sure to capitalize it\n2. Enclose the item in \"\" if it contains more than one word. EG: \"Silver Sword\")")
 
 
+@bot.command(name='redo_mid_bid', help='For repopulating when the bot drops the current bid')
+@commands.has_role('GM')
+async def restock(ctx, items):
+    global current_bid
+    global current_bidder
+    current_bidder = {}
+    current_bid = {}
+    new_stock = []
+    new_stock = items.split("; ")
+    for count in range(0, len(new_stock)):
+        new_stock[count] = new_stock[count].split(", ")
+
+    for count in range(0, len(new_stock)):
+        new_bid = new_stock[count]
+        current_bidder[new_bid[1]] = new_bid[0]
+        current_bid[new_bid[1]] = new_bid[2]
+    await ctx.send("Testing")
+
+
+
 @bot.command(name='decide_stock', help='For generating the items to be in stock this turn')
 @commands.has_role('GM')
 async def stock(ctx, number_generated: int):
