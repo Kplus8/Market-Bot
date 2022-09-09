@@ -109,6 +109,12 @@ async def bid_check(ctx):
     for x in current_bid:
         await ctx.send("Current leading bid is from " + current_bidder[x] + " for " + x + " at: " + str(current_bid[x]) + "g")
 
+@bot.command(name='event_roll', help='Randomizing event rolls')
+@commands.has_role('Season 4 Player')
+async def event(ctx):
+    severity = random.choice(range(1, 21))
+    option = random.choice(range(1, 7))
+    await ctx.send("type roll was: " + str(severity) + ". Option roll was: " + str(option) + ".")
 @bot.command(name='bid', help='To put in money into the item bidding')
 @commands.has_role('Season 4 Player')
 async def bid(ctx, bid_amount: int, item_bid):
