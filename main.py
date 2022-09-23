@@ -88,9 +88,6 @@ async def level(ctx, hp_growth: int, str_growth: int, mag_growth: int, skl_growt
             if rolls[x] <= growths[x]:
                 gained[x] = True
                 total_gains += 1
-        if ctx.author.name == "Kplus8":
-            if int(gained[1]) + int(gained[3]) + int(gained[4]) < 2:
-                total_gains = 0
 
     out1 = "HP: " + str(rolls[0]) + ', ' + "Str: " + str(rolls[1]) + ', ' + "Mag: " + str(
         rolls[2]) + ', ' + "Skl: " + str(rolls[3]) + ', ' + "Spd: " + str(rolls[4]) + ', ' + "Lck: " + str(
