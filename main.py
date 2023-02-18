@@ -2,6 +2,7 @@
 import os
 import random
 import sys
+import gspread
 
 import discord
 from discord.ext import commands
@@ -57,6 +58,83 @@ for x in hold2:
     holder2 = x.split(',')
     inventory[holder2[0]] = holder2[1]
 
+##Sheets Stuff##
+
+gc = gspread.service_account(filename='gsheets.json')
+
+sh = gc.open('turn actions')
+
+players = {
+    "Kplus8": 1,
+    "Norm": 1,
+    "Chibi": 2,
+    "Sarki Soliloquy": 3,
+    "Husky": 4,
+    # "Kplus8": 5,
+    "Shiny": 6
+}
+
+
+# test = worksheet.get('C1')
+#
+# print(worksheet.get('C1'))
+#
+# worksheet.update('C2', test)
+#
+# print(worksheet.get('C2'))
+
+@bot.command(name='submit_event_roll', help='Sending event rolls to table')
+@commands.has_role('Season 4 Player')
+async def sub_event(ctx, turn: int, event_desc: str):
+    # determine sheet_num based on user
+    name = ctx.author.name
+
+    sheet_num = players[name]
+
+    worksheet = sh.get_worksheet(sheet_num)
+    worksheet.update_cell(turn + 1, 2, event_desc)
+
+    await ctx.send("Recorded event for turn: " + str(turn))
+
+
+@bot.command(name='submit_single_action', help='Sending one character action to table')
+@commands.has_role('Season 4 Player')
+async def sub_action_single(ctx, turn: int, char_name: str, action: str):
+    # determine sheet_num based on user
+    name = ctx.author.name
+
+    sheet_num = players[name]
+
+    worksheet = sh.get_worksheet(sheet_num)
+    char_cell = worksheet.find(char_name)
+    if char_cell == None:
+        await ctx.send(
+            "Error, incorrect character name. Use `$chars` to check what the bot is looking for with the names")
+
+    worksheet.update_cell(turn + 1, char_cell.col, action)
+
+    await ctx.send("Recorded action for " + char_name + " on turn: " + str(turn))
+
+
+@bot.command(name='chars', help='Showing a player what names the bot is expecting')
+@commands.has_role('Season 4 Player')
+async def show_chars(ctx):
+    # determine sheet_num based on user
+    name = ctx.author.name
+
+    sheet_num = players[name]
+
+    worksheet = sh.get_worksheet(sheet_num)
+
+    loc_list = [3, 4, 5, 6, 7]
+    char_list = ""
+    for i in loc_list:
+        char_list += worksheet.cell(1, i).value + ", "
+    char_list = char_list.removeprefix(", ")
+    await ctx.send(char_list)
+
+
+##Sheets Stuff##
 
 ##generic die roller, for reference not use
 # @bot.command(name='roll_dice', help='Simulates rolling dice.')
@@ -100,11 +178,14 @@ async def level(ctx, hp_growth: int, str_growth: int, mag_growth: int, skl_growt
     await ctx.send(out1)
     await ctx.send(out)
 
+
 @bot.command(name='bid_check', help='To see what the current bids are')
 @commands.has_role('Season 4 Player')
 async def bid_check(ctx):
     for x in current_bid:
-        await ctx.send("Current leading bid is from " + current_bidder[x] + " for " + x + " at: " + str(current_bid[x]) + "g")
+        await ctx.send(
+            "Current leading bid is from " + current_bidder[x] + " for " + x + " at: " + str(current_bid[x]) + "g")
+
 
 @bot.command(name='event_roll', help='Randomizing event rolls')
 @commands.has_role('Season 4 Player')
@@ -112,6 +193,8 @@ async def event(ctx):
     severity = random.choice(range(1, 21))
     option = random.choice(range(1, 7))
     await ctx.send("type roll was: " + str(severity) + ". Option roll was: " + str(option) + ".")
+
+
 @bot.command(name='bid', help='To put in money into the item bidding')
 @commands.has_role('Season 4 Player')
 async def bid(ctx, bid_amount: int, item_bid):
@@ -125,12 +208,16 @@ async def bid(ctx, bid_amount: int, item_bid):
             current_bidder[item_bid] = ctx.author.name
             current_bid[item_bid] = bid_amount
             await ctx.send(
-                "Current leading bid is from " + current_bidder[item_bid] + " for " + item_bid + " at: " + str(current_bid[item_bid]))
+                "Current leading bid is from " + current_bidder[item_bid] + " for " + item_bid + " at: " + str(
+                    current_bid[item_bid]))
         else:
             await ctx.send(
-                "That is not a high enough bid for that item.\nIt is currently held by: " + current_bidder[item_bid] + " for " + item_bid + " at: " + str(current_bid[item_bid]) + ". You must outbid by "+ str(over_amount) + " in order to take the lead.")
+                "That is not a high enough bid for that item.\nIt is currently held by: " + current_bidder[
+                    item_bid] + " for " + item_bid + " at: " + str(
+                    current_bid[item_bid]) + ". You must outbid by " + str(over_amount) + " in order to take the lead.")
     else:
-        await ctx.send(item_bid + " is not currently in auction. Make sure you are spelling it correctly & try again. (Tips:\n1. case matters, make sure to capitalize it\n2. Enclose the item in \"\" if it contains more than one word. EG: \"Silver Sword\")")
+        await ctx.send(
+            item_bid + " is not currently in auction. Make sure you are spelling it correctly & try again. (Tips:\n1. case matters, make sure to capitalize it\n2. Enclose the item in \"\" if it contains more than one word. EG: \"Silver Sword\")")
 
 
 @bot.command(name='redo_mid_bid', help='For repopulating when the bot drops the current bid')
@@ -149,8 +236,7 @@ async def restock(ctx, items):
         new_bid = new_stock[count]
         current_bidder[new_bid[1]] = new_bid[0]
         current_bid[new_bid[1]] = int(new_bid[2])
-    await ctx.send("Testing")
-
+    await ctx.send("Redone")
 
 
 @bot.command(name='decide_stock', help='For generating the items to be in stock this turn')
@@ -182,13 +268,13 @@ async def stock(ctx, number_generated: int):
         if item == "Discounted Normal Item":
             key = reg_items[reg_item_count]
             reg_item_count += 1
-            price = int(inventory[key])*reg_discount
+            price = int(inventory[key]) * reg_discount
         else:
             key = item
-            price = int(type_price[key])*price_mod
+            price = int(type_price[key]) * price_mod
         current_bidder[key] = ""
         current_bid[key] = int(price)
-        await ctx.send("The starting bid for "+ key + " is: " + str(current_bid[key]) + " g")
+        await ctx.send("The starting bid for " + key + " is: " + str(current_bid[key]) + " g")
 
 
 @bot.event
@@ -198,8 +284,8 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         await ctx.send(
             'You did not provide all the required parameters. use !help {command} to confirm what is required')
-    #else:
-        #await ctx.send('unspecified error has occurred')
+    # else:
+    # await ctx.send('unspecified error has occurred')
 
 
 bot.run(TOKEN)
