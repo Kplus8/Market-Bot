@@ -114,7 +114,7 @@ async def sub_action_single(ctx, turn: int, char_name: str, action: str):
 
     worksheet = sh.get_worksheet(sheet_num)
     char_cell = worksheet.find(char_name)
-    if char_cell == None:
+    if char_cell is None:
         await ctx.send(
             "Error, incorrect character name. Use `$chars` to check what the bot is looking for with the names")
     if worksheet.cell(turn + 1, 9).value is None:
@@ -122,7 +122,7 @@ async def sub_action_single(ctx, turn: int, char_name: str, action: str):
         await ctx.send("Recorded action for " + char_name + " on turn: " + str(turn))
 
 
-@bot.command(name='submit_actions', help='Sending all character actions to table')
+@bot.command(name='submit_actions', help='Sending all character actions to table. Format for action_input is "Unit1 - Action1, Unit2 - Action2"')
 @commands.has_role('Season 4 Player')
 async def sub_actions(ctx, turn: int, action_input: str):
     # determine sheet_num based on user
