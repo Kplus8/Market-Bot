@@ -64,24 +64,30 @@ gc = gspread.service_account(filename='gsheets.json')
 
 sh = gc.open('turn actions')
 
+ev = gc.open('Event Table')
+
 players = {
-    "Kplus8": 1,
     "Norm": 1,
     "Chibi": 2,
     "Sarki Soliloquy": 3,
     "Husky": 4,
-    # "Kplus8": 5,
+    "Kplus8": 5,
     "Shiny": 6
 }
 
+@bot.command(name='refresh_events', help='For shuffling event order on a new turn')
+@commands.has_role('GM')
+async def shuffle(ctx):
+    worksheet = ev.get_worksheet(0)
 
-# test = worksheet.get('C1')
-#
-# print(worksheet.get('C1'))
-#
-# worksheet.update('C2', test)
-#
-# print(worksheet.get('C2'))
+    for x in range(4, 7):
+        store = []
+        for y in range(2, 8):
+            store.append(worksheet.cell(y, x).value)
+        random.shuffle(store)
+        for y in range(2, 8):
+            worksheet.update_cell(y, x, store.pop())
+
 
 @bot.command(name='submit_event_roll', help='Sending event rolls to table')
 @commands.has_role('Season 4 Player')
@@ -92,9 +98,10 @@ async def sub_event(ctx, turn: int, event_desc: str):
     sheet_num = players[name]
 
     worksheet = sh.get_worksheet(sheet_num)
-    worksheet.update_cell(turn + 1, 2, event_desc)
 
-    await ctx.send("Recorded event for turn: " + str(turn))
+    if worksheet.cell(turn + 1, 9).value is None:
+        worksheet.update_cell(turn + 1, 2, event_desc)
+        await ctx.send("Recorded event for turn: " + str(turn))
 
 
 @bot.command(name='submit_single_action', help='Sending one character action to table')
@@ -110,11 +117,50 @@ async def sub_action_single(ctx, turn: int, char_name: str, action: str):
     if char_cell == None:
         await ctx.send(
             "Error, incorrect character name. Use `$chars` to check what the bot is looking for with the names")
+    if worksheet.cell(turn + 1, 9).value is None:
+        worksheet.update_cell(turn + 1, char_cell.col, action)
+        await ctx.send("Recorded action for " + char_name + " on turn: " + str(turn))
 
-    worksheet.update_cell(turn + 1, char_cell.col, action)
 
-    await ctx.send("Recorded action for " + char_name + " on turn: " + str(turn))
+@bot.command(name='submit_actions', help='Sending all character actions to table')
+@commands.has_role('Season 4 Player')
+async def sub_actions(ctx, turn: int, action_input: str):
+    # determine sheet_num based on user
+    name = ctx.author.name
 
+    sheet_num = players[name]
+
+    worksheet = sh.get_worksheet(sheet_num)
+
+    action_list = action_input.split(", ")
+
+    for action in action_list:
+        action_parts = action.split(" - ")
+        char_name = action_parts[0]
+        action_desc = action_parts[1]
+
+        char_cell = worksheet.find(char_name)
+        if char_cell is None:
+            await ctx.send(
+                "Error, incorrect character name. Use `$chars` to check what the bot is looking for with the names")
+
+        if worksheet.cell(turn + 1, 9).value is None:
+            worksheet.update_cell(turn + 1, char_cell.col, action_desc)
+            await ctx.send("Recorded action for " + char_name + " on turn: " + str(turn))
+        else:
+            await ctx.send("This turn is not valid to be submitted to, if this is wrong, contact a GM")
+            break
+
+
+@bot.command(name='lock', help='Locking in actions for the turn')
+@commands.has_role('Season 4 Player')
+async def sub_actions(ctx, turn: int):
+    # determine sheet_num based on user
+    name = ctx.author.name
+    sheet_num = players[name]
+    worksheet = sh.get_worksheet(sheet_num)
+    worksheet.update_cell(turn + 1, 9, "Y")
+    await ctx.send("Locked in turn " + str(turn))
 
 @bot.command(name='chars', help='Showing a player what names the bot is expecting')
 @commands.has_role('Season 4 Player')
@@ -192,7 +238,21 @@ async def bid_check(ctx):
 async def event(ctx):
     severity = random.choice(range(1, 21))
     option = random.choice(range(1, 7))
-    await ctx.send("type roll was: " + str(severity) + ". Option roll was: " + str(option) + ".")
+
+    sev_loc = 0
+    if severity < 9:
+        sev_loc = 4
+    elif severity < 13:
+        sev_loc = 5
+    elif severity < 19:
+        sev_loc = 6
+    else:
+        sev_loc = 7
+
+    worksheet = ev.get_worksheet(0)
+    outcome = worksheet.cell(option + 1, sev_loc).value
+
+    await ctx.send("type roll was: " + str(severity) + ". Option roll was: " + str(option) + ". Event was: " + outcome)
 
 
 @bot.command(name='bid', help='To put in money into the item bidding')
