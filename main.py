@@ -243,14 +243,16 @@ async def event(ctx):
     if severity < 9:
         sev_loc = 4
     elif severity < 13:
-        sev_loc = 5
+        sev_loc = 1
     elif severity < 19:
-        sev_loc = 6
+        sev_loc = 5
     else:
-        sev_loc = 7
+        sev_loc = 6
 
     worksheet = ev.get_worksheet(0)
-    outcome = worksheet.cell(option + 1, sev_loc).value
+    outcome = "Nothing"
+    if sev_loc != 1:
+        outcome = worksheet.cell(option + 1, sev_loc).value
 
     await ctx.send("type roll was: " + str(severity) + ". Option roll was: " + str(option) + ". Event was: " + outcome)
 
