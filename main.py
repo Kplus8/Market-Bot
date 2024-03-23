@@ -8,7 +8,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-
+intents = discord.Intents.all()
 def gen_item(inven, amount):
     items = []
     for x in range(0, amount):
@@ -19,7 +19,7 @@ def gen_item(inven, amount):
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 file = "Inven_chance.csv"
 file2 = "inven_price.csv"
@@ -67,12 +67,16 @@ sh = gc.open('turn actions')
 ev = gc.open('Event Table')
 
 players = {
-    "Norm": 1,
-    "Chibi": 2,
-    "Sarki Soliloquy": 3,
-    "Husky": 4,
-    "Kplus8": 5,
-    "Shiny": 6
+    "shinysc": 1,
+    "gonzaloalbertos": 2,
+    "kplus8": 3,
+    "almosrhine": 4,
+    "jjchibi": 5,
+    "morvele": 6,
+    "anothertexan0": 7,
+    "fluberwusterdinge": 8,
+    "icyhusky737": 9,
+    "sarki_soliloquy": 10
 }
 
 @bot.command(name='refresh_events', help='For shuffling event order on a new turn')
@@ -90,7 +94,7 @@ async def shuffle(ctx):
 
 
 @bot.command(name='submit_event_roll', help='Sending event rolls to table')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def sub_event(ctx, turn: int, event_desc: str):
     # determine sheet_num based on user
     name = ctx.author.name
@@ -105,7 +109,7 @@ async def sub_event(ctx, turn: int, event_desc: str):
 
 
 @bot.command(name='submit_single_action', help='Sending one character action to table')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def sub_action_single(ctx, turn: int, char_name: str, action: str):
     # determine sheet_num based on user
     name = ctx.author.name
@@ -123,7 +127,7 @@ async def sub_action_single(ctx, turn: int, char_name: str, action: str):
 
 
 @bot.command(name='submit_actions', help='Sending all character actions to table. Format for action_input is "Unit1 - Action1, Unit2 - Action2"')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def sub_actions(ctx, turn: int, action_input: str):
     # determine sheet_num based on user
     name = ctx.author.name
@@ -153,7 +157,7 @@ async def sub_actions(ctx, turn: int, action_input: str):
 
 
 @bot.command(name='lock', help='Locking in actions for the turn')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def sub_actions(ctx, turn: int):
     # determine sheet_num based on user
     name = ctx.author.name
@@ -163,7 +167,7 @@ async def sub_actions(ctx, turn: int):
     await ctx.send("Locked in turn " + str(turn))
 
 @bot.command(name='chars', help='Showing a player what names the bot is expecting')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def show_chars(ctx):
     # determine sheet_num based on user
     name = ctx.author.name
@@ -226,7 +230,7 @@ async def level(ctx, hp_growth: int, str_growth: int, mag_growth: int, skl_growt
 
 
 @bot.command(name='bid_check', help='To see what the current bids are')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def bid_check(ctx):
     for x in current_bid:
         await ctx.send(
@@ -234,7 +238,7 @@ async def bid_check(ctx):
 
 
 @bot.command(name='event_roll', help='Randomizing event rolls')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def event(ctx):
     severity = random.choice(range(1, 21))
     option = random.choice(range(1, 7))
@@ -258,7 +262,7 @@ async def event(ctx):
 
 
 @bot.command(name='bid', help='To put in money into the item bidding')
-@commands.has_role('Season 4 Player')
+@commands.has_role('Season 5 Player')
 async def bid(ctx, bid_amount: int, item_bid):
     global current_bid
     global current_bidder
