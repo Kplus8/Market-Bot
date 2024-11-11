@@ -70,13 +70,12 @@ players = {
     "shinysc": 1,
     "gonzaloalbertos": 2,
     "kplus8": 3,
-    "almosrhine": 4,
-    "jjchibi": 5,
-    "morvele": 6,
-    "anothertexan0": 7,
-    "fluberwusterdinge": 8,
-    "icyhusky737": 9,
-    "sarki_soliloquy": 10
+    "jjchibi": 4,
+    "morvele": 5,
+    "anothertexan0": 6,
+    "dyawhy": 7,
+    "icyhusky737": 8,
+    "sarki_soliloquy": 9
 }
 
 @bot.command(name='refresh_events', help='For shuffling event order on a new turn')
