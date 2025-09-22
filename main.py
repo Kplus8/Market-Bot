@@ -68,14 +68,12 @@ ev = gc.open('Event Table')
 
 players = {
     "shinysc": 1,
-    "gonzaloalbertos": 2,
-    "kplus8": 3,
-    "jjchibi": 4,
-    "morvele": 5,
-    "anothertexan0": 6,
-    "dyawhy": 7,
-    "icyhusky737": 8,
-    "sarki_soliloquy": 9
+    "kplus8": 2,
+    "morvele": 3,
+    "anothertexan0": 4,
+    "dyawhy": 5,
+    "icyhusky737": 6,
+    "sarki_soliloquy": 7
 }
 
 @bot.command(name='refresh_events', help='For shuffling event order on a new turn')
