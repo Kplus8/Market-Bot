@@ -154,3 +154,6 @@ cython_debug/
 private key hiding
 .env
 gsheets.json
+/.idea/*
+/package.json
+/package-lock.json
